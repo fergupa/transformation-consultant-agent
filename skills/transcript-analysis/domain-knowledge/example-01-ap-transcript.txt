@@ -1,0 +1,104 @@
+Business Process Interview Transcript
+Process: Accounts Payable Invoice Processing
+Interviewee: Sarah Mitchell, Accounts Payable Clerk
+Interviewer: James Chen, Process Consultant
+Date: January 15, 2026
+Duration: 18 minutes
+
+---
+
+Interviewer: Thanks for taking the time to walk me through the accounts payable process today, Sarah. Let's start from the beginning - how do invoices first arrive at your desk?
+
+Sarah: Sure, happy to help. So we get invoices in a bunch of different ways, which is actually part of the problem. I'd say about 60% come through email to our shared AP inbox - that's ap@company.com. Maybe 25% still come through regular mail, believe it or not. And then we're starting to get some through our vendor portal in the ERP system, but that's only maybe 10-15% right now. The rest are random - sometimes vendors will hand-deliver them, or our purchasing team will forward them to us.
+
+Interviewer: Okay, so multiple channels. What's the first thing you do when you receive an invoice, let's say by email since that's the most common?
+
+Sarah: Right, so if it comes by email, I have to download the PDF attachment first. Our ERP system is pretty old and doesn't let us upload PDFs directly, which is super annoying. So I actually have to print it out - yes, print it - and then scan it back in using our document scanner. That's the only way to get it into the document management system that's integrated with the ERP. It's ridiculous, I know. We've been asking IT to fix this for like two years now.
+
+Interviewer: That does sound inefficient. So you print and scan every invoice?
+
+Sarah: Yeah, pretty much. Unless it comes through the vendor portal, those are already in the system. But for email and mail invoices, yes, print and scan. For the mailed invoices, I just scan them directly without printing, obviously. But it's still all manual scanning.
+
+Interviewer: Got it. What happens after you've scanned the invoice into the system?
+
+Sarah: Okay, so then I have to do data entry. I open up the ERP system - that's SAP in our case - and I manually enter all the invoice details. Vendor name, invoice number, invoice date, due date, line items, amounts, tax, total. Everything. Even though it's all right there on the scanned document, I have to type it in again. That usually takes about 5 to 10 minutes per invoice depending on how many line items there are.
+
+Interviewer: That's quite a bit of manual entry. Do you process many invoices?
+
+Sarah: Oh yeah. I personally handle about 100 to 150 invoices a month. And there are three of us on the AP team, so across the team we're doing 300 to 400 invoices monthly. It's a lot of data entry. And of course, with all that manual typing, mistakes happen. I'd say maybe once a week I catch an error - either I typed the amount wrong, or transposed some numbers, or something like that. Usually I catch it, but sometimes our vendors will call us saying their payment is wrong and then we have to issue a credit memo and reprocess it. That's a whole headache.
+
+Interviewer: I can imagine. So after you've entered the invoice data into SAP, what's next?
+
+Sarah: Next step is matching it to a purchase order. Most of our invoices - probably 80% - are for things that have a PO. So I have to search in SAP for the corresponding PO number. Sometimes it's on the invoice, which is great. But a lot of times it's not, so I have to search by vendor name and date range and then manually look through the open POs to find the right one. That can take a while if the vendor has multiple POs with us.
+
+Interviewer: What happens if you can't find a matching PO?
+
+Sarah: Well, if there's supposed to be a PO but I can't find it, I have to reach out to the purchasing team by email. They'll look into it and usually they either give me the PO number, or they tell me it was a non-PO purchase and I should process it differently. Those non-PO invoices need extra approval, which I'll get to in a minute. Sometimes the PO just doesn't exist and purchasing has to create one retroactively, which can take days. In the meantime, that invoice just sits in my queue and the vendor starts calling asking where their payment is.
+
+Interviewer: How often does that happen, where you can't find a PO?
+
+Sarah: Maybe 10-15% of the time? It's frequent enough to be frustrating. And it really slows things down because now I'm waiting on other people instead of just processing the invoice.
+
+Interviewer: Alright, so assuming you do find the matching PO, what's the next step?
+
+Sarah: So I link the invoice to the PO in SAP. The system does a three-way match - it checks that the invoice quantities and amounts match the PO and the receiving report. If everything matches within tolerance - I think the tolerance is like 5% or maybe $50, whichever is less - then the invoice gets approved automatically and moves to the payment queue.
+
+Interviewer: And if it doesn't match?
+
+Sarah: Then I have to investigate. I check the receiving report to see what was actually received. Maybe the vendor sent us 10 units but invoiced us for 15, or maybe the price on the invoice is different from the PO price. When that happens, I have to reach out to either purchasing or the vendor, or both, to resolve it. That can take days or even weeks sometimes. Those discrepancies are probably the biggest source of payment delays. Vendors hate it.
+
+Interviewer: I bet. So let's say the invoice matches the PO successfully. Where does it go from there?
+
+Sarah: Okay, so here's where it depends on the amount. If the invoice is under $5,000, it goes straight to the payment queue - no additional approval needed because the PO is the approval. But if it's $5,000 or more, it has to go through an additional approval step. It gets routed to the AP manager - that's my boss, Linda - and she has to review and approve it in our approval portal.
+
+Interviewer: Tell me about that approval portal. Is that a separate system?
+
+Sarah: Yes, unfortunately. It's this third-party workflow tool we use. So the invoice gets flagged in SAP as needing approval, and then SAP sends a notification to the approval portal, and the portal sends Linda an email. She has to log into the portal, look at the scanned invoice and the PO, and then click approve or reject. If she approves it, the portal sends the approval back to SAP and then it moves to the payment queue. If she rejects it, it comes back to me with comments and I have to fix whatever the issue is.
+
+Interviewer: How long does that approval process usually take?
+
+Sarah: It's supposed to take 24 hours, but realistically it's more like 2 to 3 days. Linda's really busy and sometimes those approval emails get buried in her inbox. We're always getting calls from vendors asking about invoices that are stuck in approval. It's embarrassing honestly. And here's the other annoying thing - for non-PO invoices, they ALL have to go through Linda's approval, regardless of amount. So even a $50 office supply invoice with no PO has to wait for her approval.
+
+Interviewer: So non-PO invoices always require manager approval?
+
+Sarah: Yep, every single one. Which makes sense from a control perspective, I get it. But it really creates a bottleneck. Especially at month-end when we're trying to close the books and Linda is swamped.
+
+Interviewer: Understood. So once an invoice is approved and in the payment queue, what happens next?
+
+Sarah: So we do payment runs twice a week - Tuesdays and Fridays. Our AP specialist, Marcus, he runs the payment batch in SAP. The system groups all the approved invoices that are due within the next 5 days, generates the payments, and exports them to our banking system. Most payments are ACH, some are checks for vendors that don't take electronic payment.
+
+Interviewer: Does that payment run usually go smoothly?
+
+Sarah: Usually, yeah. But sometimes invoices get stuck or fail validation and Marcus has to troubleshoot. Like if a vendor's banking information is wrong or missing, the payment will fail and we have to contact the vendor to get updated info. That delays payment by at least another week.
+
+Interviewer: And after the payment is processed, is there anything else?
+
+Sarah: The last step is vendor notification. SAP is supposed to automatically send payment remittance emails to vendors, but honestly that feature is kind of flaky. I'd say only about half the vendors actually get those emails. So we end up getting a lot of calls from vendors asking "did you pay me?" and then I have to look it up in SAP, find the payment number and date, and email them the details manually. It's another manual workaround that takes up a lot of time.
+
+Interviewer: Let me make sure I've got the full picture. Walk me through a worst-case scenario - an invoice that hits every possible snag.
+
+Sarah: Oh boy. Okay, worst case would be something like this: vendor emails an invoice, I print and scan it, enter it into SAP, can't find a matching PO, email purchasing and wait 3 days to hear back, they create a PO retroactively, I link the invoice to the PO, but there's a price discrepancy so I have to email the vendor to get a corrected invoice, that takes another 4 days, I enter the corrected invoice, now it matches but it's over $5,000 so it needs Linda's approval, I submit it to the approval portal, wait 3 days for Linda to approve it, it goes to the payment queue, but the payment run fails because the vendor's bank account info is old, I have to contact the vendor to get updated banking info, that takes another few days, I update SAP with the new bank account, and then finally on the next payment run it goes through, and then the vendor doesn't get the remittance email so they call me and I have to send them the payment details manually. That whole process could easily take 3 to 4 weeks.
+
+Interviewer: Wow. That sounds incredibly frustrating for everyone involved.
+
+Sarah: It is. And the thing is, it happens more often than you'd think. Maybe not every single snag in one invoice, but we definitely have invoices that hit multiple issues and take weeks to process. Our average days to pay is probably around 25 days, but we have terms of Net 30 with most vendors. So we're usually paying right at the deadline, which doesn't leave much buffer. If we hit any delays, we go past terms and then vendors start putting us on hold or charging late fees.
+
+Interviewer: What would you say are the biggest pain points in this whole process?
+
+Sarah: Oh man, where do I start? The printing and scanning thing is just stupid - we should be able to upload PDFs directly. The manual data entry is incredibly time-consuming and error-prone - there should be OCR or something to auto-populate the fields. The fact that we can't easily find POs is a problem - the search functionality in SAP is terrible. The whole approval portal being a separate system is annoying - why can't that just be built into SAP? Linda being the bottleneck for approvals is a huge issue - maybe we need delegated approvers or higher thresholds. And the payment remittance notification thing not working consistently is just embarrassing. Those are probably the top ones.
+
+Interviewer: If you could fix one thing, what would it be?
+
+Sarah: The manual data entry, hands down. If we could eliminate that - whether it's through direct PDF upload, or OCR, or vendor portal adoption, or all of the above - that would save me probably 10-15 hours a week. And it would reduce errors significantly. That would be huge.
+
+Interviewer: That makes sense. Is there anything else about the process I should know?
+
+Sarah: Just that we also have to deal with duplicate invoices sometimes. Like a vendor will email us an invoice, and then also mail it, or they'll resend it thinking we didn't get it. We're supposed to check for duplicates when we enter the invoice, but sometimes they slip through, especially if the invoice number is slightly different or the date is different. We've had a few cases where we accidentally paid the same invoice twice and had to chase down a refund from the vendor. That's always awkward.
+
+Interviewer: I can imagine. Well, Sarah, this has been incredibly helpful. Thank you for being so thorough and honest about the challenges.
+
+Sarah: No problem. I hope this helps you figure out how to make things better. We could definitely use some improvements.
+
+---
+
+End of transcript

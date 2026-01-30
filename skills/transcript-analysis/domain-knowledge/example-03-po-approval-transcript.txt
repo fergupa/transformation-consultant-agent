@@ -1,0 +1,110 @@
+Business Process Interview Transcript
+Process: Purchase Order Approval
+Interviewee: David Park, Procurement Manager
+Interviewer: James Chen, Process Consultant
+Date: January 17, 2026
+Duration: 14 minutes
+
+---
+
+Interviewer: Thanks for your time today, David. I want to understand your purchase order approval process. Let's start at the beginning - how does someone request a purchase order?
+
+David: Sure. So employees submit PO requests through our procurement portal - that's a module within our ERP system. They log in, fill out a request form with details like what they're buying, the quantity, estimated cost, vendor name if they know it, business justification, and their budget code. Once they submit it, it comes into the procurement queue and we start the approval routing.
+
+Interviewer: What happens after the request is submitted? What's the first step in the approval process?
+
+David: The first thing the system does is check the budget. It looks at the budget code they entered and verifies that their department has enough budget remaining for that purchase. If they don't have budget, the request gets automatically rejected and they get an email telling them insufficient budget. They'd need to either wait until the next fiscal period or talk to their department head about reallocating budget.
+
+Interviewer: How often does that happen, the automatic budget rejection?
+
+David: Not super often because most people know what their budget situation is, but I'd say maybe 5-10% of requests get rejected for budget reasons. It saves us time though, because we don't have to review requests that can't be approved anyway.
+
+Interviewer: Makes sense. So assuming the budget check passes, what's next?
+
+David: Then it goes into approval routing, and this is where it depends on the amount. We have different approval thresholds. If it's under $1,000, it just needs the requester's direct manager to approve it - that's it. If it's between $1,000 and $10,000, it needs both the manager and the department head to approve. And if it's over $10,000, it needs manager, department head, and also Finance to approve.
+
+Interviewer: Tell me more about those approval tiers. How long does each tier typically take?
+
+David: Well, for under $1,000, it's usually same-day or next-day. Managers get an email notification, they log into the portal, review the request, and approve it. Pretty quick. The $1,000 to $10,000 tier takes longer - maybe 2 to 3 days - because you're waiting for two people and if one of them is out of office or busy, it delays the whole thing. And over $10,000 can take anywhere from 3 to 5 days, sometimes up to a week, because now you've got three levels of approval and Finance is really busy, so their approval can sit in their queue for a while.
+
+Interviewer: What happens if someone rejects the request?
+
+David: If any approver rejects it, the request goes back to the requester with the rejection reason. They can either cancel it, or modify it based on the feedback - like maybe they reduce the quantity or find a cheaper vendor - and resubmit. Then it starts the whole approval process over again from scratch. That's frustrating for people when it happens.
+
+Interviewer: I bet. So let's say all the approvals go through successfully. What happens next?
+
+David: Once it's fully approved, it comes to the procurement team - that's me and my two procurement specialists. We review it to make sure it makes sense - you know, is this a reasonable purchase for the company, is the vendor legitimate, is the price competitive. We also check if the vendor is in our approved vendor list.
+
+Interviewer: What does that vendor check entail?
+
+David: So we maintain a list of approved vendors that we've vetted - we've checked their business licenses, tax ID, insurance, all that. If the vendor is on the approved list, great, we move forward. If they're not on the list, we have to vet them first, which can take a few days. We request their business information, do a credit check, verify they're a legitimate business. For new vendors it adds probably 3 to 5 days to the process.
+
+Interviewer: How often are requests for vendors not on the approved list?
+
+David: Maybe 20-30% of the time? Especially with the engineering and IT departments - they're always wanting to buy from new SaaS vendors or specialized equipment suppliers that we haven't worked with before. Marketing too, they find new vendors all the time.
+
+Interviewer: Alright, so vendor is verified. What's the next step?
+
+David: We create the official PO in the system. We enter the final negotiated price - sometimes we negotiate with the vendor to get a better price than what the requester estimated - and all the terms and conditions, delivery date, payment terms, shipping address. The system generates a PO number.
+
+Interviewer: Do you always negotiate, or only for certain amounts?
+
+David: We try to negotiate on anything over $5,000. Below that it's usually not worth the time, and frankly vendors won't negotiate on small purchases anyway. But once you get into larger amounts, there's often room to negotiate - maybe we can get a volume discount, or better payment terms, or free shipping, things like that. It doesn't always work, but it's worth trying.
+
+Interviewer: How long does that negotiation take when it happens?
+
+David: Could be a few hours, could be a few days. Depends on how responsive the vendor is and how complex the purchase is. Sometimes we're waiting on vendor quotes or contracts to be reviewed by our legal team if it's a big purchase.
+
+Interviewer: Legal review adds another layer?
+
+David: Only for really big purchases or new contracts - like if it's over $50,000 or if it involves a service contract with ongoing commitments. Then legal has to review the vendor's terms and conditions, make sure we're protected. That can add a week or more depending on how backed up legal is. But that's probably only 5% of our POs.
+
+Interviewer: Okay, so PO is created. What happens after that?
+
+David: We send the PO to the vendor. That's usually automated - the system sends them an email with the PO attached as a PDF. The vendor is supposed to acknowledge receipt and confirm they can fulfill the order on the requested timeline. If they can't, we have to go back to the requester and let them know there's a delivery delay, and they can decide if they want to wait or find a different vendor.
+
+Interviewer: How often do vendors come back and say they can't fulfill on time?
+
+David: Not too often, maybe 10% of the time. More common is they just don't respond at all to the PO email, and then we're sitting there wondering if they got it, and we have to call them. Our vendors are not great about acknowledging POs, honestly. We probably have to follow up manually on like 40% of them.
+
+Interviewer: That sounds tedious.
+
+David: It is. And here's another pain point - sometimes the requester marks their PO as "urgent" even when it's not really urgent. The portal has an urgency flag - routine, urgent, or emergency. Emergency is supposed to be for things like a critical equipment repair where we need it same day. Urgent is for things needed within a week. Routine is normal processing. But people abuse the urgent and emergency flags to try to get their PO through faster. So then we're scrambling to expedite a PO and it turns out it's not actually urgent at all. That happens probably once a week.
+
+Interviewer: How do you handle that?
+
+David: We've tried to educate people on proper use of the urgency flags, but it still happens. Now we spot-check urgent and emergency requests - we email the requester's manager to confirm it's really urgent before we expedite it. That slows things down a bit but it stops the flag abuse.
+
+Interviewer: What else slows down the process or causes issues?
+
+David: Incomplete requests are a big one. People submit PO requests without enough detail - they don't specify the exact product or model number, or they don't provide a vendor name, or the business justification is vague like "we need this for the project." Then we have to go back to them and ask for more information, and it delays everything. I'd say 20-25% of requests are incomplete when we first get them.
+
+Interviewer: Why do you think that happens?
+
+David: People are in a hurry, or they don't understand what information we need, or they're just not detail-oriented. We've created a checklist and guidelines, but people don't read them. It's frustrating for everyone - the requester is wondering why their PO is taking so long, and we're waiting for them to give us basic information.
+
+Interviewer: Are there any other common pain points?
+
+David: Yeah, the approval bottlenecks I mentioned earlier - especially Finance approvals for large POs. Finance only has two people who can approve these, and they're approving expense reports and invoices and everything else too, so POs sometimes sit in their queue for days. We've asked to add more approvers or raise the threshold for Finance approval - like maybe make it $25,000 instead of $10,000 - but so far no luck.
+
+Also, the whole system is manual in the sense that we don't have good visibility into where things are. Like, if a requester emails me asking "hey, where's my PO?", I have to log into the portal and look up the specific request to see whose desk it's sitting on. There's no dashboard that shows me all the POs and their status at a glance. We've been asking IT for that for over a year.
+
+Interviewer: That's a significant limitation. How many POs are you processing a month?
+
+David: We do about 200 to 250 POs a month across the procurement team. So it's a lot to track manually. And most people submit their POs at the end of the month when they realize their budget is about to expire, so we get slammed at month-end, which makes the delays even worse.
+
+Interviewer: What would you say is the biggest improvement you could make to this process?
+
+David: I think clearer policies and better training for requesters would help with the incomplete requests and urgency flag abuse. That's a people and process issue. But from a system perspective, the biggest thing would be better visibility and tracking - a dashboard showing all POs, their status, who they're waiting on, how long they've been pending. That would help us manage the workflow better and give requesters self-service ability to check on their own POs instead of emailing us. That would probably save us 5-10 hours a week in status update emails alone.
+
+Interviewer: Makes sense. Is there anything else about the PO approval process I should know?
+
+David: Just that most of it works okay, it's just slow and manual. The multi-tier approvals make sense from a control perspective - we need oversight on spending. But the combination of multi-tier approvals, vendor verification, incomplete requests, and manual tracking creates a lot of friction. On a good day, a simple PO can go through in a day or two. On a bad day, with rejections and back-and-forth and delays, it can take 2-3 weeks. We try to set expectations with requesters that they should submit POs at least 2 weeks before they need the item, but not everyone does that.
+
+Interviewer: Understood. Well, thank you so much for walking me through this, David. Very helpful.
+
+David: No problem. Hope it helps improve things!
+
+---
+
+End of transcript

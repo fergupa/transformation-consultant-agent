@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_PO_Approval"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="Transformation Consultant Agent - BPMN Generation Skill (Manual Reference)"
+                  exporterVersion="1.0">
+
+  <bpmn:process id="Process_PO_Approval" name="Purchase Order Approval Process" isExecutable="false">
+
+    <!-- Swimlanes -->
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Employee" name="Employee">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1_InitiatePurchaseRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1_BudgetCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_BudgetRejection</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_Manager" name="Manager">
+        <bpmn:flowNodeRef>Gateway_2_ApprovalTier</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_3_ManagerApproval</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_DeptHead" name="Department Head">
+        <bpmn:flowNodeRef>Gateway_4_DeptHeadApproval</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_Finance" name="Finance">
+        <bpmn:flowNodeRef>Gateway_5_FinanceApproval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_2_RouteForApproval</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_Procurement" name="Procurement Team">
+        <bpmn:flowNodeRef>Activity_3_ReviewRequisition</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_4_VendorEvaluation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_6_VendorApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_7_PriceNegotiation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_6_IssuePurchaseOrder</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_9_VendorFulfillment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_Legal" name="Legal Team">
+        <bpmn:flowNodeRef>Gateway_8_LegalReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_5_ObtainLegalReview</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_1" name="Purchase Need Identified">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Activity 1: Initiate Purchase Request -->
+    <bpmn:task id="Activity_1_InitiatePurchaseRequest" name="5.1.1 Initiate Purchase Request">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:incoming>Flow_Resubmit</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway 1: Budget Verification Check -->
+    <bpmn:exclusiveGateway id="Gateway_1_BudgetCheck" name="Budget Available?">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_BudgetPass</bpmn:outgoing>
+      <bpmn:outgoing>Flow_BudgetFail</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- End Event: Budget Rejection -->
+    <bpmn:endEvent id="EndEvent_BudgetRejection" name="Request Cancelled (Budget)">
+      <bpmn:incoming>Flow_BudgetFail</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Gateway 2: Approval Tier Determination -->
+    <bpmn:exclusiveGateway id="Gateway_2_ApprovalTier" name="Amount?">
+      <bpmn:incoming>Flow_BudgetPass</bpmn:incoming>
+      <bpmn:outgoing>Flow_Tier1</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Tier2</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Tier3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 2: Route for Approval (consolidated for all tiers) -->
+    <bpmn:task id="Activity_2_RouteForApproval" name="5.1.3 Route for Approval">
+      <bpmn:incoming>Flow_Tier1</bpmn:incoming>
+      <bpmn:incoming>Flow_Tier2</bpmn:incoming>
+      <bpmn:incoming>Flow_Tier3</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToManager</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway 3: Manager Approval -->
+    <bpmn:exclusiveGateway id="Gateway_3_ManagerApproval" name="Manager Approves?">
+      <bpmn:incoming>Flow_ToManager</bpmn:incoming>
+      <bpmn:outgoing>Flow_ManagerApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ManagerRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Gateway 4: Department Head Approval (Tier 2 and 3 only) -->
+    <bpmn:exclusiveGateway id="Gateway_4_DeptHeadApproval" name="Dept Head Approves?">
+      <bpmn:incoming>Flow_ManagerApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_DeptHeadApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DeptHeadRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Gateway 5: Finance Approval (Tier 3 only) -->
+    <bpmn:exclusiveGateway id="Gateway_5_FinanceApproval" name="Finance Approves?">
+      <bpmn:incoming>Flow_DeptHeadApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_FinanceApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_FinanceRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 3: Review Requisition -->
+    <bpmn:task id="Activity_3_ReviewRequisition" name="5.1.2 Review Requisition">
+      <bpmn:incoming>Flow_FinanceApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Activity 4: Vendor Evaluation -->
+    <bpmn:task id="Activity_4_VendorEvaluation" name="5.1.5 Conduct Vendor Evaluation">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway 6: Vendor Approved Status -->
+    <bpmn:exclusiveGateway id="Gateway_6_VendorApproved" name="Vendor Approved?">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_VendorApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_VendorVetting</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Gateway 7: Price Negotiation Threshold -->
+    <bpmn:exclusiveGateway id="Gateway_7_PriceNegotiation" name="Over $5k?">
+      <bpmn:incoming>Flow_VendorApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_NegotiationNeeded</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NoNegotiation</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Gateway 8: Legal Review Required -->
+    <bpmn:exclusiveGateway id="Gateway_8_LegalReview" name="Legal Review Required?">
+      <bpmn:incoming>Flow_NegotiationNeeded</bpmn:incoming>
+      <bpmn:incoming>Flow_NoNegotiation</bpmn:incoming>
+      <bpmn:outgoing>Flow_LegalNeeded</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NoLegal</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 5: Obtain Legal Review -->
+    <bpmn:task id="Activity_5_ObtainLegalReview" name="5.1.4 Obtain Legal Review">
+      <bpmn:incoming>Flow_LegalNeeded</bpmn:incoming>
+      <bpmn:outgoing>Flow_LegalComplete</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Activity 6: Issue Purchase Order -->
+    <bpmn:task id="Activity_6_IssuePurchaseOrder" name="5.1.6 Issue Purchase Order">
+      <bpmn:incoming>Flow_LegalComplete</bpmn:incoming>
+      <bpmn:incoming>Flow_NoLegal</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway 9: Vendor Fulfillment Capability -->
+    <bpmn:exclusiveGateway id="Gateway_9_VendorFulfillment" name="Vendor Can Fulfill?">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_CanFulfill</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CannotFulfill</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- End Event -->
+    <bpmn:endEvent id="EndEvent_1" name="PO Issued to Vendor">
+      <bpmn:incoming>Flow_CanFulfill</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Activity_1_InitiatePurchaseRequest" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Activity_1_InitiatePurchaseRequest" targetRef="Gateway_1_BudgetCheck" />
+    <bpmn:sequenceFlow id="Flow_BudgetPass" name="Yes" sourceRef="Gateway_1_BudgetCheck" targetRef="Gateway_2_ApprovalTier" />
+    <bpmn:sequenceFlow id="Flow_BudgetFail" name="No" sourceRef="Gateway_1_BudgetCheck" targetRef="EndEvent_BudgetRejection" />
+
+    <bpmn:sequenceFlow id="Flow_Tier1" name="Under $1k" sourceRef="Gateway_2_ApprovalTier" targetRef="Activity_2_RouteForApproval" />
+    <bpmn:sequenceFlow id="Flow_Tier2" name="$1k-$10k" sourceRef="Gateway_2_ApprovalTier" targetRef="Activity_2_RouteForApproval" />
+    <bpmn:sequenceFlow id="Flow_Tier3" name="Over $10k" sourceRef="Gateway_2_ApprovalTier" targetRef="Activity_2_RouteForApproval" />
+
+    <bpmn:sequenceFlow id="Flow_ToManager" sourceRef="Activity_2_RouteForApproval" targetRef="Gateway_3_ManagerApproval" />
+    <bpmn:sequenceFlow id="Flow_ManagerApproved" name="Approved" sourceRef="Gateway_3_ManagerApproval" targetRef="Gateway_4_DeptHeadApproval" />
+    <bpmn:sequenceFlow id="Flow_ManagerRejected" name="Rejected" sourceRef="Gateway_3_ManagerApproval" targetRef="Activity_1_InitiatePurchaseRequest" />
+
+    <bpmn:sequenceFlow id="Flow_DeptHeadApproved" name="Approved" sourceRef="Gateway_4_DeptHeadApproval" targetRef="Gateway_5_FinanceApproval" />
+    <bpmn:sequenceFlow id="Flow_DeptHeadRejected" name="Rejected" sourceRef="Gateway_4_DeptHeadApproval" targetRef="Activity_1_InitiatePurchaseRequest" />
+
+    <bpmn:sequenceFlow id="Flow_FinanceApproved" name="Approved" sourceRef="Gateway_5_FinanceApproval" targetRef="Activity_3_ReviewRequisition" />
+    <bpmn:sequenceFlow id="Flow_FinanceRejected" name="Rejected" sourceRef="Gateway_5_FinanceApproval" targetRef="Activity_1_InitiatePurchaseRequest" />
+    <bpmn:sequenceFlow id="Flow_Resubmit" name="Resubmit" sourceRef="Gateway_3_ManagerApproval" targetRef="Activity_1_InitiatePurchaseRequest" />
+
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Activity_3_ReviewRequisition" targetRef="Activity_4_VendorEvaluation" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Activity_4_VendorEvaluation" targetRef="Gateway_6_VendorApproved" />
+    <bpmn:sequenceFlow id="Flow_VendorApproved" name="Yes" sourceRef="Gateway_6_VendorApproved" targetRef="Gateway_7_PriceNegotiation" />
+    <bpmn:sequenceFlow id="Flow_VendorVetting" name="No (Vetting)" sourceRef="Gateway_6_VendorApproved" targetRef="Activity_4_VendorEvaluation" />
+
+    <bpmn:sequenceFlow id="Flow_NegotiationNeeded" name="Yes" sourceRef="Gateway_7_PriceNegotiation" targetRef="Gateway_8_LegalReview" />
+    <bpmn:sequenceFlow id="Flow_NoNegotiation" name="No" sourceRef="Gateway_7_PriceNegotiation" targetRef="Gateway_8_LegalReview" />
+
+    <bpmn:sequenceFlow id="Flow_LegalNeeded" name="Over $50k or Service Contract" sourceRef="Gateway_8_LegalReview" targetRef="Activity_5_ObtainLegalReview" />
+    <bpmn:sequenceFlow id="Flow_NoLegal" name="No" sourceRef="Gateway_8_LegalReview" targetRef="Activity_6_IssuePurchaseOrder" />
+    <bpmn:sequenceFlow id="Flow_LegalComplete" sourceRef="Activity_5_ObtainLegalReview" targetRef="Activity_6_IssuePurchaseOrder" />
+
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Activity_6_IssuePurchaseOrder" targetRef="Gateway_9_VendorFulfillment" />
+    <bpmn:sequenceFlow id="Flow_CanFulfill" name="Yes" sourceRef="Gateway_9_VendorFulfillment" targetRef="EndEvent_1" />
+    <bpmn:sequenceFlow id="Flow_CannotFulfill" name="No (Find New Vendor)" sourceRef="Gateway_9_VendorFulfillment" targetRef="Activity_4_VendorEvaluation" />
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_PO_Approval">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="Lane_Employee_di" bpmnElement="Lane_Employee" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2000" height="150" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Manager_di" bpmnElement="Lane_Manager" isHorizontal="true">
+        <dc:Bounds x="160" y="230" width="2000" height="150" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_DeptHead_di" bpmnElement="Lane_DeptHead" isHorizontal="true">
+        <dc:Bounds x="160" y="380" width="2000" height="150" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Finance_di" bpmnElement="Lane_Finance" isHorizontal="true">
+        <dc:Bounds x="160" y="530" width="2000" height="150" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
+        <dc:Bounds x="160" y="680" width="2000" height="200" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Legal_di" bpmnElement="Lane_Legal" isHorizontal="true">
+        <dc:Bounds x="160" y="880" width="2000" height="150" />
+      </bpmndi:BPMNShape>
+
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="220" y="140" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="202" y="183" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activities and Gateways (simplified positioning) -->
+      <bpmndi:BPMNShape id="Activity_1_di" bpmnElement="Activity_1_InitiatePurchaseRequest">
+        <dc:Bounds x="300" y="118" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_1_di" bpmnElement="Gateway_1_BudgetCheck" isMarkerVisible="true">
+        <dc:Bounds x="460" y="133" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_Budget_di" bpmnElement="EndEvent_BudgetRejection">
+        <dc:Bounds x="467" y="60" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_2_di" bpmnElement="Gateway_2_ApprovalTier" isMarkerVisible="true">
+        <dc:Bounds x="560" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Activity_2_di" bpmnElement="Activity_2_RouteForApproval">
+        <dc:Bounds x="660" y="565" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_3_di" bpmnElement="Gateway_3_ManagerApproval" isMarkerVisible="true">
+        <dc:Bounds x="830" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_4_di" bpmnElement="Gateway_4_DeptHeadApproval" isMarkerVisible="true">
+        <dc:Bounds x="950" y="430" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_5_di" bpmnElement="Gateway_5_FinanceApproval" isMarkerVisible="true">
+        <dc:Bounds x="1070" y="580" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Activity_3_di" bpmnElement="Activity_3_ReviewRequisition">
+        <dc:Bounds x="1160" y="720" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Activity_4_di" bpmnElement="Activity_4_VendorEvaluation">
+        <dc:Bounds x="1320" y="720" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_6_di" bpmnElement="Gateway_6_VendorApproved" isMarkerVisible="true">
+        <dc:Bounds x="1480" y="735" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_7_di" bpmnElement="Gateway_7_PriceNegotiation" isMarkerVisible="true">
+        <dc:Bounds x="1570" y="735" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_8_di" bpmnElement="Gateway_8_LegalReview" isMarkerVisible="true">
+        <dc:Bounds x="1660" y="735" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Activity_5_di" bpmnElement="Activity_5_ObtainLegalReview">
+        <dc:Bounds x="1720" y="915" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Activity_6_di" bpmnElement="Activity_6_IssuePurchaseOrder">
+        <dc:Bounds x="1880" y="720" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_9_di" bpmnElement="Gateway_9_VendorFulfillment" isMarkerVisible="true">
+        <dc:Bounds x="2040" y="735" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="2132" y="742" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- Sequence Flows (edges) - simplified, not all waypoints shown -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="256" y="158" />
+        <di:waypoint x="300" y="158" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="420" y="158" />
+        <di:waypoint x="460" y="158" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Additional edges would be added here with waypoints -->
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

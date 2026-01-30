@@ -1,0 +1,120 @@
+Business Process Interview Transcript
+Process: Accounts Payable - Invoice Matching and Payment Processing
+Interviewee: Jennifer Park, Senior AP Specialist
+Interviewer: Marcus Thompson, Business Analyst
+Date: January 20, 2026
+Duration: 17 minutes
+
+---
+
+Interviewer: Thanks for sitting down with me today, Jennifer. I want to understand your accounts payable process, specifically around invoice matching and payments. Can you walk me through what happens when an invoice arrives?
+
+Jennifer: Sure. So when we get an invoice - and they come in mostly by email to our AP mailbox, some through our vendor portal - the first thing I do is log it in our tracking spreadsheet. We don't have a great system for tracking invoices as they move through the process, so I maintain this Excel file with the invoice number, vendor, amount, date received, current status. It's pretty manual but it's the only way I know what's in my queue.
+
+Interviewer: Interesting. So tracking happens outside your main system. What do you do after logging it?
+
+Jennifer: After I log it, I check if the invoice has a PO number on it. If it does, I go into our ERP - we use Oracle - and I search for that PO to pull up the details. I need to compare what the vendor is billing us against what we actually ordered and what we received. That's the three-way match everyone talks about.
+
+Interviewer: Walk me through that three-way match process.
+
+Jennifer: Okay, so I have the invoice in front of me - either on paper or I've downloaded the PDF. I'm looking at the line items, quantities, and prices. Then I pull up the PO in Oracle and I'm comparing: does the invoice description match the PO description? Are the quantities the same? Are the unit prices the same? And then I also have to look at the receiving report in the system to confirm we actually got the items.
+
+The problem is, these three things almost never match perfectly. The invoice might say "Widget Model X" and the PO says "Widget X" and the receiving says "WGT-X" because the warehouse guys use abbreviations. So I have to use my judgment to decide if they're talking about the same thing. That takes time and sometimes I'm not sure, so I have to email the buyer who created the PO or the warehouse to confirm.
+
+Interviewer: How often would you say the descriptions don't match exactly?
+
+Jennifer: I'd say maybe 30-40% of the time there's some kind of description discrepancy that makes me pause and think "is this the same item?" Usually it is the same thing but with different wording, but I've caught situations where it wasn't and we would have paid for the wrong items.
+
+Interviewer: What about quantity and price matching?
+
+Jennifer: Quantity mismatches happen a lot. Maybe we ordered 100 units but the vendor only shipped 95, or they shipped 100 but our receiving report says 98 because two were damaged. So now the invoice is for 100 but we only accepted 98. I have to decide: do I short-pay the vendor for the 2 units we didn't accept, or do I reach out and get clarification first? Policy says I should always clarify first, but if I did that for every small variance I'd never get anything done. So if it's under like 5% variance or under $50, I usually just adjust the invoice amount myself and note it. But for bigger variances I have to email the vendor and the buyer and figure out what happened.
+
+Price discrepancies are worse. Sometimes the PO has an old price from a previous quote, but the vendor has increased their prices and the invoice reflects the new price. Or sometimes there's a volume discount that wasn't captured in the PO. Or shipping and tax - the PO might not include tax and shipping but the invoice does. Every time there's a price difference I have to investigate. Is this a legitimate price increase? Did we agree to it? Is there a contract that locks in the price? That investigation can take days if I have to wait for the buyer to respond.
+
+Interviewer: How do you handle those price differences while you're waiting for clarification?
+
+Jennifer: The invoice just sits in my queue. I mark it in my spreadsheet as "on hold - pending buyer response" and then I follow up every couple of days until I get an answer. Meanwhile the vendor is calling asking where their payment is, and I have to explain we're investigating a discrepancy. Some vendors are understanding, some get really frustrated, especially if it's a small difference like $20 and they're like "just pay us, we'll credit you back if it's wrong." But we can't do that because of internal controls.
+
+Interviewer: Let me ask about duplicate invoices. Is that an issue you deal with?
+
+Jennifer: Oh my god, yes. Duplicate invoices are a huge problem. Vendors will send us the same invoice multiple times - maybe they email it, then they also mail it, or they forget they already sent it and send it again a month later. Or sometimes they'll send the same invoice but change the invoice number slightly, like adding a letter at the end or changing the date.
+
+Interviewer: How do you catch those duplicates?
+
+Jennifer: When I'm entering an invoice, I'm supposed to search in Oracle for that vendor to see if we've already processed an invoice with the same amount and date. But honestly, if the invoice number is different or the date is slightly different, the system won't flag it as a duplicate. So it's really on me to remember "wait, didn't we already pay XYZ Company for $2,500 for this project?" I catch most of them, but a few slip through.
+
+Interviewer: What happens when a duplicate invoice slips through?
+
+Jennifer: Then we end up paying the vendor twice. Usually the vendor catches it eventually and issues us a refund, or we catch it during month-end reconciliation when we're reviewing payments. But it's embarrassing and it ties up our cash unnecessarily. And the real problem is getting the money back. Some vendors are quick about it, but others drag their feet or say "oh we'll just apply it as a credit to your next invoice" which messes up our accounting.
+
+Interviewer: How often would you estimate duplicate payments happen?
+
+Jennifer: Maybe once or twice a month? Out of the roughly 200 invoices I process monthly, that's like 1%. It doesn't sound like much but it adds up, especially when some of these are for thousands of dollars.
+
+Interviewer: Let's move on to the actual payment part. Once an invoice is matched and approved, what happens next?
+
+Jennifer: So once I've verified everything matches - or I've resolved any discrepancies - I code the invoice. That means I enter the general ledger account codes for what we're paying for. Like if it's office supplies, it goes to the supplies expense account. If it's a software subscription, it goes to the IT expense account. That GL coding is really important for our financial reporting.
+
+Then I enter the invoice into the system for payment. I put in the invoice number, date, amount, GL codes, payment terms. The vendor in our system should already have their payment method set up - either ACH direct deposit or check. We try to get everyone on ACH but some vendors still insist on checks.
+
+Interviewer: After you've entered it for payment, what's the next step?
+
+Jennifer: It goes into the payment approval queue. Our AP manager has to approve any payment over $10,000. Under that, it's automatically approved. The manager reviews the backup - the invoice, the PO, the receiving report - and if everything looks good, she approves it for payment.
+
+Interviewer: How long does that manager approval take?
+
+Jennifer: Usually a day or two. She's pretty good about staying on top of it. But during month-end or quarter-end it can take longer because she's dealing with close activities.
+
+Interviewer: And after approval?
+
+Jennifer: After it's approved, it goes into the payment batch. We do payment runs three times a week - Monday, Wednesday, Friday. Our system generates the ACH file or the checks on those days, and the payments go out. ACH hits the vendor's bank usually the next business day. Checks go in the mail the same day and take however long mail takes.
+
+Interviewer: Do you notify vendors when you've processed their payment?
+
+Jennifer: The system is supposed to send an automatic email remittance advice when we pay them, with the invoice number and payment amount. But like a lot of our system features, it doesn't work reliably. I'd say maybe half the vendors get the remittance advice. The others end up calling us or emailing saying "did you pay invoice 12345?" and then I have to look it up and send them the payment details manually. It's time-consuming.
+
+Interviewer: Let's talk about invoice aging. What happens if an invoice is sitting unpaid for a long time?
+
+Jennifer: We track aging in the system - there are reports that show invoices 30 days old, 60 days, 90 days, over 90. Every week I review the aging report and try to clear out the old stuff. Usually if something's old it's because it's stuck waiting for a response from a buyer about a discrepancy, or it's a complicated invoice that I haven't had time to deal with, or there's a dispute with the vendor.
+
+The problem is vendors start charging us late fees if we go past terms. Most of our vendors are Net 30, so if we haven't paid by 30 days from invoice date, we might get hit with a late fee or interest. That's frustrating especially when the delay was because we were waiting on our own people to respond to questions.
+
+Interviewer: How do you prevent those late payments?
+
+Jennifer: I try to prioritize by due date. I have a column in my tracking spreadsheet for due date and I sort by that to make sure I'm working on the ones that are coming due soonest. But it's not perfect because new invoices are always coming in and I'm constantly juggling priorities. And if I'm waiting on someone else for information, there's not much I can do except keep following up.
+
+Interviewer: What about invoices without a PO? How do you handle those?
+
+Jennifer: Non-PO invoices are trickier because I don't have a PO to match against. So I have to verify with the requester that we actually received the goods or services and that the amount is correct. I email the person whose name is on the invoice or the budget owner for that cost center and ask them to confirm. Sometimes they respond right away, sometimes it takes multiple reminders over a week or more.
+
+And non-PO invoices always require manager approval regardless of amount, because there's no PO approval on file. So even a $50 invoice has to go through the approval queue, which some people think is overkill but that's the policy.
+
+Interviewer: What percentage of your invoices are non-PO?
+
+Jennifer: Maybe 15-20%? Things like utility bills, insurance premiums, professional services, subscriptions - a lot of those don't have POs. They're recurring or they're not the type of thing that goes through procurement.
+
+Interviewer: What are the biggest pain points in this whole process for you?
+
+Jennifer: The biggest one is definitely the matching discrepancies - the descriptions not matching exactly, the quantities being off, the prices being different. That probably accounts for half of my time, just investigating and resolving those. If our POs and our receiving and our vendor invoices all agreed with each other, my job would be so much easier.
+
+Second would be duplicate invoices. We really need better duplicate detection in the system. I shouldn't have to manually remember what I've already paid.
+
+Third is the manual tracking in Excel. I shouldn't need a separate spreadsheet to know what invoices I have and where they are in the process. The system should be able to tell me that, but it doesn't have a good view of invoices in progress.
+
+And the communication delays - waiting for buyers or requesters to get back to me about questions - that causes a lot of the aging and late payment issues.
+
+Interviewer: If you could fix one thing, what would it be?
+
+Jennifer: Better system intelligence around matching. Like, if the system could recognize that "Widget Model X" and "Widget X" and "WGT-X" are the same thing, or if it could auto-approve small variances under a certain threshold, that would eliminate so much manual work. Some kind of AI or smart matching would be amazing.
+
+Interviewer: That makes sense. Anything else I should know about the process?
+
+Jennifer: Just that the volume is manageable now - about 200 invoices a month for me - but we're growing and I don't think the process will scale well. It's too manual and too dependent on my personal knowledge and judgment. We need more automation and better tools if we're going to handle more volume without hiring more people.
+
+Interviewer: Got it. Thanks so much for your time, Jennifer. This has been really helpful.
+
+Jennifer: You're welcome. I hope it leads to some improvements!
+
+---
+
+End of transcript

@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_1"
+                  targetNamespace="http://bpmn.io/schema/bpmn"
+                  exporter="Transformation Consultant Agent - BPMN Generation Skill"
+                  exporterVersion="1.0">
+
+  <bpmn:process id="Process_APInvoiceProcessing" name="Accounts Payable Invoice Processing" isExecutable="false">
+
+    <!-- Swimlanes -->
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_APClerk" name="AP Clerk">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1_InvoiceChannel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1_ReceiveInvoice</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_2_CaptureInvoiceData</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_3_MatchInvoiceToPO</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_2_POFound</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_4_ResolveMissingPO</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_3_MatchResult</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_6_InvestigateDiscrepancies</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_9_ResolveFailedPayment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_10_VendorNotification</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_7_NotificationSuccess</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SAPSystem" name="SAP System">
+        <bpmn:flowNodeRef>Activity_5_ThreeWayMatch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_4_ApprovalThreshold</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_APManager" name="AP Manager">
+        <bpmn:flowNodeRef>Activity_7_RouteForApproval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_5_ManagerDecision</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_APSpecialist" name="AP Specialist">
+        <bpmn:flowNodeRef>Activity_8_ProcessPayment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_6_PaymentValidation</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_1" name="Invoice Received">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Activity 1: Receive Vendor Invoice (APQC 3.2.1) -->
+    <!-- Consolidates Steps 1-3: Receive invoice, download attachments, print/scan -->
+    <bpmn:task id="Activity_1_ReceiveInvoice" name="3.2.1 Receive Vendor Invoice">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Decision Point 1: Invoice Channel Routing -->
+    <bpmn:exclusiveGateway id="Gateway_1_InvoiceChannel" name="Invoice Channel?">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3_Email</bpmn:outgoing>
+      <bpmn:outgoing>Flow_3_Mail</bpmn:outgoing>
+      <bpmn:outgoing>Flow_3_Portal</bpmn:outgoing>
+      <bpmn:outgoing>Flow_3_Other</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 2: Capture Invoice Data (APQC 3.2.2) -->
+    <!-- Consolidates channel-specific handling and manual data entry (Steps 2-4) -->
+    <bpmn:task id="Activity_2_CaptureInvoiceData" name="3.2.2 Capture Invoice Data">
+      <bpmn:incoming>Flow_3_Email</bpmn:incoming>
+      <bpmn:incoming>Flow_3_Mail</bpmn:incoming>
+      <bpmn:incoming>Flow_3_Portal</bpmn:incoming>
+      <bpmn:incoming>Flow_3_Other</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Activity 3: Match Invoice to Purchase Order (APQC 3.2.3) -->
+    <!-- Consolidates Steps 5, 7: Search for PO and link invoice to PO -->
+    <bpmn:task id="Activity_3_MatchInvoiceToPO" name="3.2.3 Match Invoice to Purchase Order">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:incoming>Flow_6_Resolved</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Decision Point 2: PO Matching Success -->
+    <bpmn:exclusiveGateway id="Gateway_2_POFound" name="PO Found?">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6_NotFound</bpmn:outgoing>
+      <bpmn:outgoing>Flow_7_Found</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 4: Resolve Missing PO (Exception Handling) -->
+    <!-- Step 6: Contact purchasing team, obtain PO or non-PO designation -->
+    <bpmn:task id="Activity_4_ResolveMissingPO" name="3.2.7 Handle Exceptions (Missing PO)">
+      <bpmn:incoming>Flow_6_NotFound</bpmn:incoming>
+      <bpmn:outgoing>Flow_6_Resolved</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Activity 5: Three-Way Match Validation (APQC 3.2.4) -->
+    <!-- Step 8: Automated three-way match in SAP -->
+    <bpmn:task id="Activity_5_ThreeWayMatch" name="3.2.4 Verify Invoice Accuracy (Three-Way Match)">
+      <bpmn:incoming>Flow_7_Found</bpmn:incoming>
+      <bpmn:incoming>Flow_9_Resolved</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Decision Point 3: Three-Way Match Result -->
+    <bpmn:exclusiveGateway id="Gateway_3_MatchResult" name="Match Successful?">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9_Failed</bpmn:outgoing>
+      <bpmn:outgoing>Flow_10_Success</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 6: Investigate and Resolve Discrepancies (Exception Handling) -->
+    <!-- Step 9: Contact purchasing/vendor to resolve discrepancies -->
+    <bpmn:task id="Activity_6_InvestigateDiscrepancies" name="3.2.7 Handle Exceptions (Discrepancies)">
+      <bpmn:incoming>Flow_9_Failed</bpmn:incoming>
+      <bpmn:outgoing>Flow_9_Resolved</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Decision Point 4: Approval Threshold Check -->
+    <bpmn:exclusiveGateway id="Gateway_4_ApprovalThreshold" name="Approval Required?">
+      <bpmn:incoming>Flow_10_Success</bpmn:incoming>
+      <bpmn:outgoing>Flow_11_AutoApprove</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12_RequiresApproval</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 7: Route Invoice for Approval (APQC 3.2.5) -->
+    <!-- Steps 10-11: Route to approval portal and manager review -->
+    <bpmn:task id="Activity_7_RouteForApproval" name="3.2.5 Route Invoice for Approval">
+      <bpmn:incoming>Flow_12_RequiresApproval</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Decision Point 5: Manager Approval Decision -->
+    <bpmn:exclusiveGateway id="Gateway_5_ManagerDecision" name="Approved?">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_15_Rejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Rejection loop back to data capture for correction -->
+    <bpmn:sequenceFlow id="Flow_15_Rejected" name="Rejected" sourceRef="Gateway_5_ManagerDecision" targetRef="Activity_2_CaptureInvoiceData">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Rejected</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <!-- Activity 8: Process Payment (APQC 3.2.6) -->
+    <!-- Step 13: Payment batch processing -->
+    <bpmn:task id="Activity_8_ProcessPayment" name="3.2.6 Process Payment">
+      <bpmn:incoming>Flow_11_AutoApprove</bpmn:incoming>
+      <bpmn:incoming>Flow_14_Approved</bpmn:incoming>
+      <bpmn:incoming>Flow_17_Resolved</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Decision Point 6: Payment Validation Success -->
+    <bpmn:exclusiveGateway id="Gateway_6_PaymentValidation" name="Payment Valid?">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17_Failed</bpmn:outgoing>
+      <bpmn:outgoing>Flow_18_Success</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Activity 9: Resolve Failed Payment (Exception Handling) -->
+    <!-- Step 14: Contact vendor for banking information -->
+    <bpmn:task id="Activity_9_ResolveFailedPayment" name="3.2.7 Handle Exceptions (Failed Payment)">
+      <bpmn:incoming>Flow_17_Failed</bpmn:incoming>
+      <bpmn:outgoing>Flow_17_Resolved</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Activity 10: Vendor Payment Notification -->
+    <!-- Step 15: Automated notification with manual workaround -->
+    <bpmn:task id="Activity_10_VendorNotification" name="3.2.8 Vendor Notification">
+      <bpmn:incoming>Flow_18_Success</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Decision Point 7: Payment Notification Success -->
+    <bpmn:exclusiveGateway id="Gateway_7_NotificationSuccess" name="Notification Received?">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_20_Success</bpmn:outgoing>
+      <bpmn:outgoing>Flow_21_Failed</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Manual notification workaround loops back -->
+    <bpmn:sequenceFlow id="Flow_21_Failed" name="Failed (50%)" sourceRef="Gateway_7_NotificationSuccess" targetRef="Activity_10_VendorNotification">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Notification Failed</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <!-- End Event -->
+    <bpmn:endEvent id="EndEvent_1" name="Invoice Processing Complete">
+      <bpmn:incoming>Flow_20_Success</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Activity_1_ReceiveInvoice" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Activity_1_ReceiveInvoice" targetRef="Gateway_1_InvoiceChannel" />
+    
+    <bpmn:sequenceFlow id="Flow_3_Email" name="Email (60%)" sourceRef="Gateway_1_InvoiceChannel" targetRef="Activity_2_CaptureInvoiceData">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Email</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_3_Mail" name="Mail (25%)" sourceRef="Gateway_1_InvoiceChannel" targetRef="Activity_2_CaptureInvoiceData">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Mail</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_3_Portal" name="Portal (10-15%)" sourceRef="Gateway_1_InvoiceChannel" targetRef="Activity_2_CaptureInvoiceData">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Vendor Portal</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_3_Other" name="Other" sourceRef="Gateway_1_InvoiceChannel" targetRef="Activity_2_CaptureInvoiceData">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Other</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Activity_2_CaptureInvoiceData" targetRef="Activity_3_MatchInvoiceToPO" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Activity_3_MatchInvoiceToPO" targetRef="Gateway_2_POFound" />
+    
+    <bpmn:sequenceFlow id="Flow_6_NotFound" name="Not Found (10-15%)" sourceRef="Gateway_2_POFound" targetRef="Activity_4_ResolveMissingPO">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">PO Not Found</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_6_Resolved" sourceRef="Activity_4_ResolveMissingPO" targetRef="Activity_3_MatchInvoiceToPO" />
+    
+    <bpmn:sequenceFlow id="Flow_7_Found" name="Found (80%)" sourceRef="Gateway_2_POFound" targetRef="Activity_5_ThreeWayMatch">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">PO Found</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Activity_5_ThreeWayMatch" targetRef="Gateway_3_MatchResult" />
+    
+    <bpmn:sequenceFlow id="Flow_9_Failed" name="Failed" sourceRef="Gateway_3_MatchResult" targetRef="Activity_6_InvestigateDiscrepancies">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Match Failed</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_9_Resolved" sourceRef="Activity_6_InvestigateDiscrepancies" targetRef="Activity_5_ThreeWayMatch" />
+    
+    <bpmn:sequenceFlow id="Flow_10_Success" name="Success" sourceRef="Gateway_3_MatchResult" targetRef="Gateway_4_ApprovalThreshold">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Match Success</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_11_AutoApprove" name="Under $5k with PO" sourceRef="Gateway_4_ApprovalThreshold" targetRef="Activity_8_ProcessPayment">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Under $5000 with PO</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_12_RequiresApproval" name="≥$5k or No PO" sourceRef="Gateway_4_ApprovalThreshold" targetRef="Activity_7_RouteForApproval">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Requires Approval</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Activity_7_RouteForApproval" targetRef="Gateway_5_ManagerDecision" />
+    
+    <bpmn:sequenceFlow id="Flow_14_Approved" name="Approved" sourceRef="Gateway_5_ManagerDecision" targetRef="Activity_8_ProcessPayment">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Approved</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Activity_8_ProcessPayment" targetRef="Gateway_6_PaymentValidation" />
+    
+    <bpmn:sequenceFlow id="Flow_17_Failed" name="Failed" sourceRef="Gateway_6_PaymentValidation" targetRef="Activity_9_ResolveFailedPayment">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Payment Failed</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_17_Resolved" sourceRef="Activity_9_ResolveFailedPayment" targetRef="Activity_8_ProcessPayment" />
+    
+    <bpmn:sequenceFlow id="Flow_18_Success" name="Success" sourceRef="Gateway_6_PaymentValidation" targetRef="Activity_10_VendorNotification">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Payment Success</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Activity_10_VendorNotification" targetRef="Gateway_7_NotificationSuccess" />
+    
+    <bpmn:sequenceFlow id="Flow_20_Success" name="Success (50%)" sourceRef="Gateway_7_NotificationSuccess" targetRef="EndEvent_1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">Notification Success</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+  </bpmn:process>
+
+  <!-- Diagram Information -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_APInvoiceProcessing">
+
+      <!-- Lane Shapes -->
+      <bpmndi:BPMNShape id="Lane_APClerk_di" bpmnElement="Lane_APClerk" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2400" height="400" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SAPSystem_di" bpmnElement="Lane_SAPSystem" isHorizontal="true">
+        <dc:Bounds x="160" y="480" width="2400" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_APManager_di" bpmnElement="Lane_APManager" isHorizontal="true">
+        <dc:Bounds x="160" y="730" width="2400" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_APSpecialist_di" bpmnElement="Lane_APSpecialist" isHorizontal="true">
+        <dc:Bounds x="160" y="980" width="2400" height="250" />
+      </bpmndi:BPMNShape>
+
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="220" y="220" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="197" y="263" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 1: Receive Vendor Invoice -->
+      <bpmndi:BPMNShape id="Activity_1_ReceiveInvoice_di" bpmnElement="Activity_1_ReceiveInvoice">
+        <dc:Bounds x="300" y="198" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 1: Invoice Channel -->
+      <bpmndi:BPMNShape id="Gateway_1_InvoiceChannel_di" bpmnElement="Gateway_1_InvoiceChannel" isMarkerVisible="true">
+        <dc:Bounds x="445" y="213" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="425" y="183" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 2: Capture Invoice Data -->
+      <bpmndi:BPMNShape id="Activity_2_CaptureInvoiceData_di" bpmnElement="Activity_2_CaptureInvoiceData">
+        <dc:Bounds x="540" y="198" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 3: Match Invoice to PO -->
+      <bpmndi:BPMNShape id="Activity_3_MatchInvoiceToPO_di" bpmnElement="Activity_3_MatchInvoiceToPO">
+        <dc:Bounds x="685" y="198" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 2: PO Found -->
+      <bpmndi:BPMNShape id="Gateway_2_POFound_di" bpmnElement="Gateway_2_POFound" isMarkerVisible="true">
+        <dc:Bounds x="830" y="213" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="823" y="183" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 4: Resolve Missing PO -->
+      <bpmndi:BPMNShape id="Activity_4_ResolveMissingPO_di" bpmnElement="Activity_4_ResolveMissingPO">
+        <dc:Bounds x="805" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 5: Three-Way Match -->
+      <bpmndi:BPMNShape id="Activity_5_ThreeWayMatch_di" bpmnElement="Activity_5_ThreeWayMatch">
+        <dc:Bounds x="925" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 3: Match Result -->
+      <bpmndi:BPMNShape id="Gateway_3_MatchResult_di" bpmnElement="Gateway_3_MatchResult" isMarkerVisible="true">
+        <dc:Bounds x="1070" y="555" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1048" y="525" width="94" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 6: Investigate Discrepancies -->
+      <bpmndi:BPMNShape id="Activity_6_InvestigateDiscrepancies_di" bpmnElement="Activity_6_InvestigateDiscrepancies">
+        <dc:Bounds x="1045" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 4: Approval Threshold -->
+      <bpmndi:BPMNShape id="Gateway_4_ApprovalThreshold_di" bpmnElement="Gateway_4_ApprovalThreshold" isMarkerVisible="true">
+        <dc:Bounds x="1165" y="555" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1148" y="525" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 7: Route for Approval -->
+      <bpmndi:BPMNShape id="Activity_7_RouteForApproval_di" bpmnElement="Activity_7_RouteForApproval">
+        <dc:Bounds x="1260" y="815" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 5: Manager Decision -->
+      <bpmndi:BPMNShape id="Gateway_5_ManagerDecision_di" bpmnElement="Gateway_5_ManagerDecision" isMarkerVisible="true">
+        <dc:Bounds x="1405" y="830" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1402" y="800" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 8: Process Payment -->
+      <bpmndi:BPMNShape id="Activity_8_ProcessPayment_di" bpmnElement="Activity_8_ProcessPayment">
+        <dc:Bounds x="1500" y="1040" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 6: Payment Validation -->
+      <bpmndi:BPMNShape id="Gateway_6_PaymentValidation_di" bpmnElement="Gateway_6_PaymentValidation" isMarkerVisible="true">
+        <dc:Bounds x="1645" y="1055" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1626" y="1025" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 9: Resolve Failed Payment -->
+      <bpmndi:BPMNShape id="Activity_9_ResolveFailedPayment_di" bpmnElement="Activity_9_ResolveFailedPayment">
+        <dc:Bounds x="1620" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Activity 10: Vendor Notification -->
+      <bpmndi:BPMNShape id="Activity_10_VendorNotification_di" bpmnElement="Activity_10_VendorNotification">
+        <dc:Bounds x="1740" y="198" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 7: Notification Success -->
+      <bpmndi:BPMNShape id="Gateway_7_NotificationSuccess_di" bpmnElement="Gateway_7_NotificationSuccess" isMarkerVisible="true">
+        <dc:Bounds x="1885" y="213" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1878" y="183" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- End Event -->
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1980" y="220" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1957" y="263" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Sequence Flow Edges -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="256" y="238" />
+        <di:waypoint x="300" y="238" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="400" y="238" />
+        <di:waypoint x="445" y="238" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_Email_di" bpmnElement="Flow_3_Email">
+        <di:waypoint x="495" y="238" />
+        <di:waypoint x="540" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="220" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_Mail_di" bpmnElement="Flow_3_Mail">
+        <di:waypoint x="470" y="263" />
+        <di:waypoint x="470" y="290" />
+        <di:waypoint x="540" y="290" />
+        <di:waypoint x="540" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="475" y="273" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_Portal_di" bpmnElement="Flow_3_Portal">
+        <di:waypoint x="470" y="213" />
+        <di:waypoint x="470" y="180" />
+        <di:waypoint x="540" y="180" />
+        <di:waypoint x="540" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="465" y="163" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_Other_di" bpmnElement="Flow_3_Other">
+        <di:waypoint x="470" y="263" />
+        <di:waypoint x="470" y="310" />
+        <di:waypoint x="540" y="310" />
+        <di:waypoint x="540" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="485" y="293" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="640" y="238" />
+        <di:waypoint x="685" y="238" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="785" y="238" />
+        <di:waypoint x="830" y="238" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_6_NotFound_di" bpmnElement="Flow_6_NotFound">
+        <di:waypoint x="855" y="263" />
+        <di:waypoint x="855" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="860" y="273" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_6_Resolved_di" bpmnElement="Flow_6_Resolved">
+        <di:waypoint x="805" y="360" />
+        <di:waypoint x="735" y="360" />
+        <di:waypoint x="735" y="278" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_7_Found_di" bpmnElement="Flow_7_Found">
+        <di:waypoint x="855" y="263" />
+        <di:waypoint x="855" y="580" />
+        <di:waypoint x="925" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="860" y="420" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="1025" y="580" />
+        <di:waypoint x="1070" y="580" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_9_Failed_di" bpmnElement="Flow_9_Failed">
+        <di:waypoint x="1095" y="555" />
+        <di:waypoint x="1095" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1100" y="475" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_9_Resolved_di" bpmnElement="Flow_9_Resolved">
+        <di:waypoint x="1045" y="360" />
+        <di:waypoint x="975" y="360" />
+        <di:waypoint x="975" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_10_Success_di" bpmnElement="Flow_10_Success">
+        <di:waypoint x="1120" y="580" />
+        <di:waypoint x="1165" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1125" y="562" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_11_AutoApprove_di" bpmnElement="Flow_11_AutoApprove">
+        <di:waypoint x="1190" y="605" />
+        <di:waypoint x="1190" y="1080" />
+        <di:waypoint x="1500" y="1080" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1195" y="840" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_12_RequiresApproval_di" bpmnElement="Flow_12_RequiresApproval">
+        <di:waypoint x="1190" y="605" />
+        <di:waypoint x="1190" y="855" />
+        <di:waypoint x="1260" y="855" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1195" y="727" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1360" y="855" />
+        <di:waypoint x="1405" y="855" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_14_Approved_di" bpmnElement="Flow_14_Approved">
+        <di:waypoint x="1430" y="880" />
+        <di:waypoint x="1430" y="1080" />
+        <di:waypoint x="1500" y="1080" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1435" y="977" width="50" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_15_Rejected_di" bpmnElement="Flow_15_Rejected">
+        <di:waypoint x="1430" y="830" />
+        <di:waypoint x="1430" y="150" />
+        <di:waypoint x="590" y="150" />
+        <di:waypoint x="590" y="198" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1435" y="487" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="1600" y="1080" />
+        <di:waypoint x="1645" y="1080" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_17_Failed_di" bpmnElement="Flow_17_Failed">
+        <di:waypoint x="1670" y="1055" />
+        <di:waypoint x="1670" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1675" y="725" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_17_Resolved_di" bpmnElement="Flow_17_Resolved">
+        <di:waypoint x="1620" y="360" />
+        <di:waypoint x="1550" y="360" />
+        <di:waypoint x="1550" y="1040" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_18_Success_di" bpmnElement="Flow_18_Success">
+        <di:waypoint x="1670" y="1055" />
+        <di:waypoint x="1670" y="238" />
+        <di:waypoint x="1740" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1675" y="644" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="1840" y="238" />
+        <di:waypoint x="1885" y="238" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_20_Success_di" bpmnElement="Flow_20_Success">
+        <di:waypoint x="1935" y="238" />
+        <di:waypoint x="1980" y="238" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1930" y="220" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_21_Failed_di" bpmnElement="Flow_21_Failed">
+        <di:waypoint x="1910" y="263" />
+        <di:waypoint x="1910" y="330" />
+        <di:waypoint x="1790" y="330" />
+        <di:waypoint x="1790" y="278" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1915" y="273" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

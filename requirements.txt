@@ -1,0 +1,27 @@
+# Core Dependencies
+anthropic>=0.40.0              # Claude API client
+python-dotenv>=1.0.0           # Environment variable management
+
+# Jupyter and Interactive Development
+jupyter>=1.0.0                 # Jupyter notebook environment
+ipykernel>=6.29.0              # Jupyter kernel
+notebook>=7.0.0                # Jupyter notebook interface
+
+# Voice Integration (Phase 3)
+elevenlabs>=1.0.0              # ElevenLabs text-to-speech API
+
+# BPMN and Process Modeling (future)
+# bpmn-python>=0.0.20          # BPMN diagram generation (uncomment when needed)
+
+# Utilities
+requests>=2.31.0               # HTTP requests
+pathlib>=1.0.1                 # Path handling (usually built-in but explicit for clarity)
+
+# Development and Testing
+pytest>=8.0.0                  # Testing framework
+pytest-asyncio>=0.23.0         # Async testing support
+black>=24.0.0                  # Code formatting
+flake8>=7.0.0                  # Linting
+
+# Optional: Data handling and visualization
+pandas>=2.2.0                  # Data manipulation (if needed for metrics)
