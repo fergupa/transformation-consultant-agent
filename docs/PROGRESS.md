@@ -1,5 +1,273 @@
 # Development Progress Log
 
+## Session: 2026-01-31 - Modular Architecture Refactoring
+
+### Summary
+
+Refactored the codebase from a prototype structure (SKILL.md prompts + standalone test scripts) to a production-ready modular architecture with reusable Python components, pipeline orchestration, and comprehensive integration tests. Phase 1 is now **COMPLETE** (4 of 4 tasks). All code pushed to `refactor` branch and PR created.
+
+### Completed Work
+
+#### 1. GitHub Repository Setup
+
+- Initialized git repository locally
+- Created GitHub repo at https://github.com/fergupa/transformation-consultant-agent
+- Pushed initial commit to `main` branch
+- Created `refactor` branch for architecture work
+
+#### 2. Component Interface & Skill Manager (Foundation)
+
+**BaseComponent Interface:**
+- [src/interfaces/component.py](../src/interfaces/component.py)
+  - `ComponentResult` dataclass: Standardized result format with `success`, `data`, `metadata`, `error`, `timestamp`
+  - `BaseComponent` ABC: Abstract base class enforcing `component_name`, `skill_path`, `validate_input()`, `process()`
+  - Protected helpers: `_get_client()` (lazy Anthropic init), `_load_skill_prompt()`, `_call_claude()` (shared API logic)
+
+**SkillManager:**
+- [src/skills/skill_manager.py](../src/skills/skill_manager.py)
+  - Loads and caches SKILL.md files and domain knowledge
+  - Methods: `load_skill_prompt()`, `load_domain_knowledge()`, `list_domain_knowledge_files()`
+  - File-level caching to avoid repeated disk reads
+
+#### 3. Component Implementations
+
+**TranscriptProcessor:**
+- [src/components/input/transcript_processor.py](../src/components/input/transcript_processor.py)
+  - Loads `skills/transcript-analysis/SKILL.md`
+  - Validates input is non-empty string (>100 chars)
+  - Supports optional domain knowledge examples in system messages
+  - Returns analysis markdown via ComponentResult
+
+**BPMNGenerator:**
+- [src/components/generation/bpmn_generator.py](../src/components/generation/bpmn_generator.py)
+  - Loads `skills/bpmn-generation/SKILL.md`
+  - Loads APQC activities reference as cached context (`cache_control: ephemeral`)
+  - Validates input has required sections: `## Process Steps`, `## Actors and Roles`, `## Decision Points`
+  - Extracts XML from markdown code blocks if wrapped in ```xml
+  - Validates output BPMN XML: namespace, process element, start/end events
+  - Returns element counts in metadata (tasks, gateways, lanes, flows)
+
+**RecommendationEngine:**
+- [src/components/optimization/recommendation_engine.py](../src/components/optimization/recommendation_engine.py)
+  - Loads `skills/process-optimization/SKILL.md`
+  - Defaults to Claude Opus 4.5 for better reasoning on complex recommendations
+  - Supports optional `business_context` parameter for industry/budget context
+  - Validates input has `## Process Steps` and `## Pain Points` sections
+  - Checks output for expected sections (Executive Summary, Quick Wins, Implementation Roadmap)
+
+#### 4. Pipeline Orchestration System
+
+**Pipeline & PipelineResult:**
+- [src/pipeline.py](../src/pipeline.py)
+  - `Pipeline` class: Sequential component execution with `add_component()` and `execute()`
+  - `input_from` config: Allows components to receive output from any previous component (not just the immediately preceding one)
+  - Intermediate output tracking: Stores all component outputs for non-sequential routing
+  - `PipelineResult`: Contains `success`, `outputs`, `metadata`, `errors`
+  - `save_outputs()`: Saves component outputs to appropriate file formats (.md, .bpmn, .json)
+  - Handles None outputs gracefully (skips failed components during save)
+
+**Key Design Decision - `input_from` routing:**
+- The full pipeline is: Transcript → Analysis → BPMN → Recommendations
+- BPMN receives analysis output (sequential)
+- RecommendationEngine also needs analysis (not BPMN), so uses `input_from: "Transcript Analysis"` to route back to the first component's output
+- This was discovered and fixed during integration testing
+
+#### 5. Main Orchestrator
+
+- [src/main.py](../src/main.py)
+  - `get_api_key()`: Loads from `config/.env`
+  - `create_full_pipeline()`: Full pipeline with `input_from` routing for recommendations
+  - `create_analysis_pipeline()`: Transcript → Analysis only
+  - `create_bpmn_pipeline()`: Analysis → BPMN only
+  - `run_full_transformation()`: High-level function handling file I/O and pipeline execution
+  - `main()`: Command-line interface (`python -m src.main <transcript_path> [output_dir]`)
+
+#### 6. Integration Tests
+
+- [tests/test_pipeline_integration.py](../tests/test_pipeline_integration.py)
+  - **TestComponentIndividual** (3 tests): Each component in isolation with real API calls
+  - **TestPipelineIntegration** (3 tests): Pipeline execution, full pipeline, output saving
+  - **TestComponentValidation** (2 tests): Input validation logic (no API calls)
+  - All 8 tests passing ✓
+
+**Test Results:**
+- ✓ test_transcript_processor - PASSED
+- ✓ test_bpmn_generator - PASSED
+- ✓ test_recommendation_engine - PASSED
+- ✓ test_analysis_pipeline - PASSED
+- ✓ test_full_pipeline - PASSED (1:03:49 - runs all 3 API calls sequentially)
+- ✓ test_pipeline_with_save - PASSED
+- ✓ test_transcript_processor_validation - PASSED
+- ✓ test_bpmn_generator_validation - PASSED
+
+#### 7. Test Migration
+
+- Moved `test_bpmn_generation.py` → `tests/legacy/test_bpmn_generation.py`
+- Moved `test_process_optimization.py` → `tests/legacy/test_process_optimization.py`
+- Kept `test_setup.py` in root for environment verification
+
+#### 8. Documentation
+
+- [ARCHITECTURE.md](../ARCHITECTURE.md) - Comprehensive architecture documentation
+  - Design philosophy and component diagram
+  - Interface definitions and component descriptions
+  - Key design decisions with rationale (7 decisions documented)
+  - Data flow diagrams
+  - Error handling strategy
+  - Testing strategy (unit/integration/e2e pyramid)
+  - Future enhancement roadmap
+  - Usage examples
+
+- [README.md](../README.md) - Updated with:
+  - New project structure reflecting modular architecture
+  - Three usage patterns (high-level, component-level, pipeline)
+  - Command-line usage instructions
+  - Architecture section linking to ARCHITECTURE.md
+  - Phase 1 marked as COMPLETE
+
+### Project File Structure
+
+```
+transformation-consultant-agent/
+├── src/                                  [NEW - Modular Architecture]
+│   ├── __init__.py
+│   ├── main.py                           # Orchestrator + CLI
+│   ├── pipeline.py                       # Pipeline + PipelineResult
+│   ├── interfaces/
+│   │   ├── __init__.py
+│   │   └── component.py                  # BaseComponent + ComponentResult
+│   ├── components/
+│   │   ├── __init__.py
+│   │   ├── input/
+│   │   │   ├── __init__.py
+│   │   │   └── transcript_processor.py   # TranscriptProcessor
+│   │   ├── analysis/
+│   │   │   └── __init__.py               # Placeholder for future
+│   │   ├── generation/
+│   │   │   ├── __init__.py
+│   │   │   └── bpmn_generator.py         # BPMNGenerator
+│   │   └── optimization/
+│   │       ├── __init__.py
+│   │       └── recommendation_engine.py  # RecommendationEngine
+│   └── skills/
+│       ├── __init__.py
+│       └── skill_manager.py              # SkillManager
+│
+├── skills/                               [UNCHANGED]
+│   ├── transcript-analysis/              [COMPLETE]
+│   ├── bpmn-generation/                  [COMPLETE]
+│   └── process-optimization/             [COMPLETE]
+│
+├── tests/                                [UPDATED]
+│   ├── __init__.py
+│   ├── test_pipeline_integration.py      [NEW - 8 tests, all passing]
+│   └── legacy/                           [MIGRATED]
+│       ├── test_bpmn_generation.py
+│       └── test_process_optimization.py
+│
+├── outputs/                              [UNCHANGED]
+├── data/                                 [UNCHANGED]
+├── config/                               [UNCHANGED]
+├── notebooks/                            [UNCHANGED]
+├── ARCHITECTURE.md                       [NEW]
+├── README.md                             [UPDATED]
+├── test_setup.py                         [UNCHANGED]
+└── requirements.txt                      [UNCHANGED]
+```
+
+### Key Technical Decisions
+
+1. **Keep SKILL.md Files Separate from Code**
+   - Prompts are "configuration" not "code"
+   - Non-developers can update prompts without touching Python
+   - Same SKILL.md works across CLI, API, Jupyter, Teams bot
+   - Git history shows prompt changes clearly
+
+2. **Abstract Base Classes for Components**
+   - Enforces all components implement required methods at definition time
+   - IDE autocomplete and type checking work correctly
+   - Makes adding new components straightforward (implement 4 methods)
+
+3. **Sequential Pipeline with `input_from` Routing**
+   - Base pattern is simple sequential execution
+   - `input_from` config allows non-sequential routing when needed
+   - Discovered during testing: RecommendationEngine needs analysis, not BPMN
+   - Simple extension to the base pattern, no complex DAG needed
+
+4. **Opus 4.5 for RecommendationEngine Only**
+   - Optimization requires deep reasoning (ROI calculations, technology recommendations)
+   - Sonnet sufficient for transcript analysis and BPMN generation
+   - Configurable per-component, can override if needed
+
+5. **Lazy Anthropic Client Initialization**
+   - Client only created when first API call is made
+   - Enables component instantiation without API keys (useful for testing validation logic)
+   - Reduces memory overhead when components aren't used
+
+6. **None-Safe Output Saving**
+   - `save_outputs()` skips None values from failed components
+   - Prevents crashes when saving partial pipeline results
+   - Important for debugging failed pipelines
+
+### Lessons Learned
+
+1. **Pipeline Data Flow Needs Careful Design**
+   - A purely sequential pipeline doesn't work when components need non-adjacent outputs
+   - The `input_from` routing pattern was the minimal fix - avoids full DAG complexity
+   - Test end-to-end before assuming sequential flow works
+
+2. **Integration Tests Catch Real Issues**
+   - Unit tests passed for all components individually
+   - Full pipeline test revealed the data routing issue
+   - Real API calls are necessary - mocks won't catch input validation failures against real outputs
+
+3. **BPMN Validation Logic Should Be Reused**
+   - Ported validation from `test_bpmn_generation.py` into `BPMNGenerator` component
+   - Prevents generating invalid BPMN that can't be visualized
+   - Returns element counts in metadata for quick sanity checks
+
+4. **Windows Path Handling**
+   - Git commands need Unix-style paths in the shell (`/c/Projects/...`)
+   - Python code uses `Path()` which handles both formats
+   - `load_dotenv("config/.env")` works from the project root
+
+### Git History
+
+```
+b2f4637  Refactor to modular component-based architecture  (refactor branch)
+4d50290  Initial commit                                     (main branch)
+```
+
+### Next Steps
+
+#### Phase 2: Teams Integration
+- [ ] Build Teams bot using Bot Framework
+- [ ] Handle file uploads (transcripts)
+- [ ] Display BPMN diagrams via Adaptive Cards
+- [ ] Deploy to Azure Bot Service
+
+#### Phase 3: Voice Integration
+- [ ] Create voice walkthrough skill
+- [ ] Integrate ElevenLabs API
+- [ ] Generate audio explanations
+- [ ] Deliver via Teams
+
+#### Architecture Enhancements (Future)
+- Async execution using `asyncio` for parallel component execution
+- Retry logic with exponential backoff for API failures
+- Caching component outputs to avoid re-running expensive operations
+- FastAPI wrapper for REST API access
+- Plugin system for user-defined components
+
+---
+
+**Last Updated**: 2026-01-31
+**Phase**: Phase 1 - Core Pipeline **COMPLETE** ✅ | Phase 2: Teams Integration (next)
+**Status**: Modular architecture refactored, all tests passing, pushed to `refactor` branch
+**Branch**: `refactor` → PR open to merge into `main`
+
+---
+
 ## Session: 2026-01-26 - Process Optimization Skill & BPMN Validation
 
 ### Summary
